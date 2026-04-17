@@ -1,0 +1,153 @@
+# ============================================================
+#  VIBES EVENTS — .gitignore
+#  Stack: Astro + Tailwind + React (frontend) | Spring Boot + Maven + PostgreSQL (backend)
+# ============================================================
+
+# ─────────────────────────────────────────
+#  SISTEMA OPERATIVO
+# ─────────────────────────────────────────
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ─────────────────────────────────────────
+#  EDITORES / IDEs
+# ─────────────────────────────────────────
+
+# VS Code — mantener .vscode/extensions.json si quieres compartir extensiones recomendadas
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# IntelliJ IDEA / WebStorm
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# ─────────────────────────────────────────
+#  FRONTEND — Astro + Node.js
+# ─────────────────────────────────────────
+
+frontend/node_modules/
+frontend/.npm
+frontend/dist/
+frontend/.astro/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Turbo / cache
+frontend/.turbo/
+frontend/.cache/
+
+# ─────────────────────────────────────────
+#  BACKEND — Spring Boot + Maven
+# ─────────────────────────────────────────
+
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Archivos de configuración con secretos — usar application.properties / application.yml
+# y NO commitear las versiones con datos reales
+backend/src/main/resources/application-local.properties
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-prod.properties
+backend/src/main/resources/application-prod.yml
+
+# Logs de Spring
+backend/*.log
+backend/logs/
+
+# ─────────────────────────────────────────
+#  BASE DE DATOS
+# ─────────────────────────────────────────
+
+# Docker volumes locales
+postgres-data/
+*.sql.bak
+
+# ─────────────────────────────────────────
+#  DOCKER
+# ─────────────────────────────────────────
+
+# Nunca ignorar docker-compose.yml ni Dockerfiles
+# Sí ignorar overrides con secretos locales
+docker-compose.override.yml
+.env.docker
+
+# ─────────────────────────────────────────
+#  VARIABLES DE ENTORNO / SECRETOS
+# ─────────────────────────────────────────
+
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+*.jks
+secrets/
+
+# ─────────────────────────────────────────
+#  JAVA GENERAL
+# ─────────────────────────────────────────
+
+*.class
+*.jar
+!**/test/**/*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# ─────────────────────────────────────────
+#  TESTING
+# ─────────────────────────────────────────
+
+# JaCoCo coverage
+backend/target/site/jacoco/
+
+# ─────────────────────────────────────────
+#  MISCELÁNEA
+# ─────────────────────────────────────────
+
+# Archivos de backup
+*.bak
+*.swp
+*.tmp
+*.orig
+
+# Archivos de compresión temporales
+*.zip
+*.tar.gz
+*.rar
