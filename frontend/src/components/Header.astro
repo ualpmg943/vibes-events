@@ -7,7 +7,7 @@ const navItems = [
 ];
 ---
 
-<header id="main-header" class="fixed top-0 w-full z-50 transition-all duration-500">
+<header id="main-header" class="fixed top-0 w-full z-50 transition-all duration-500 border-b border-transparent">
   <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
     <a href="/" class="text-2xl font-bold tracking-tighter text-white flex items-center gap-1 hover:opacity-80 transition-opacity">
       <span class="text-gold-500">VIBE</span>EVENTS
@@ -36,9 +36,11 @@ const navItems = [
 
   const updateHeader = () => {
     if (window.scrollY > 20) {
-      header?.classList.add('bg-zinc-950/60', 'backdrop-blur-xl', 'border-b', 'border-white/5');
+      header?.classList.remove('border-transparent');
+      header?.classList.add('bg-zinc-950/60', 'backdrop-blur-xl', 'border-white/5');
     } else {
-      header?.classList.remove('bg-zinc-950/60', 'backdrop-blur-xl', 'border-b', 'border-white/5');
+      header?.classList.add('border-transparent');
+      header?.classList.remove('bg-zinc-950/60', 'backdrop-blur-xl', 'border-white/5');
     }
   };
 
