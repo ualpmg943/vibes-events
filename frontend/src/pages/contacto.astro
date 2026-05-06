@@ -1,0 +1,214 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout
+  title="Contacto"
+  description="Contacta con VIBE EVENTS para contratar sonido, iluminación y DJ para tu evento en Almería."
+>
+  <Header />
+
+  <main class="min-h-screen pt-20 pb-24 relative">
+
+    <!-- Glow de fondo -->
+    <div class="pointer-events-none fixed inset-0 z-0">
+      <div class="absolute top-0 left-0 w-[700px] h-[700px] rounded-full bg-gold-500/8 blur-[200px]"></div>
+      <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gold-500/5 blur-[150px]"></div>
+    </div>
+
+    <!-- Hero -->
+    <div class="relative z-10 text-center pt-16 pb-14 px-6">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-8">
+        <span class="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse"></span>
+        Presupuesto y Reservas
+      </div>
+      <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-none mb-5">
+        Hablemos de<br />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600">tu evento</span>
+      </h1>
+      <p class="text-zinc-400 text-base md:text-lg max-w-lg mx-auto">
+        Rellena el formulario o contacta directamente. Te responderemos con un presupuesto personalizado.
+      </p>
+    </div>
+
+    <!-- Layout Principal: Dos columnas con CSS Grid explícito -->
+    <div class="relative z-10 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="contact-layout">
+
+          <!-- ───── COLUMNA IZQUIERDA: FORMULARIO ───── -->
+          <div class="contact-form-col rounded-[2.5rem] bg-zinc-900/50 border border-white/5 backdrop-blur-xl shadow-2xl p-10 md:p-14 relative overflow-hidden">
+            <!-- Glow interior -->
+            <div class="absolute -top-24 -right-24 w-72 h-72 bg-gold-500/10 rounded-full blur-[90px] pointer-events-none"></div>
+
+            <div class="relative z-10">
+              <h2 class="text-2xl font-bold text-white mb-1">Cuéntanos todo</h2>
+              <p class="text-zinc-500 text-sm mb-10">Todos los campos son obligatorios salvo el teléfono.</p>
+
+              <form
+                action="https://formspree.io/f/MAY_NEED_YOUR_ID"
+                method="POST"
+                class="flex flex-col gap-8"
+              >
+                <!-- Nombre + Teléfono -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label for="name" class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Nombre completo</label>
+                    <input
+                      type="text"
+                      name="name"
+                      id="name"
+                      required
+                      placeholder="Ej. Pablo García"
+                      class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label for="phone" class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Teléfono (opcional)</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      id="phone"
+                      placeholder="+34 600 000 000"
+                      class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                  <label for="email" class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Correo electrónico</label>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    required
+                    placeholder="correo@ejemplo.com"
+                    class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all"
+                  />
+                </div>
+
+                <!-- Mensaje -->
+                <div>
+                  <label for="message" class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Tu mensaje</label>
+                  <textarea
+                    name="message"
+                    id="message"
+                    rows="6"
+                    required
+                    placeholder="Cuéntanos la fecha, el lugar y lo que necesitas para tu evento..."
+                    class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all resize-none"
+                  ></textarea>
+                </div>
+
+                <!-- Botón -->
+                <div class="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    class="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.2)] hover:shadow-[0_0_50px_rgba(212,175,55,0.5)] active:scale-95"
+                  >
+                    Enviar mensaje
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- ───── COLUMNA DERECHA: INFO ───── -->
+          <div class="contact-info-col flex flex-col gap-6">
+
+            <!-- Tarjeta: Contacto Directo -->
+            <div class="rounded-[2.5rem] bg-zinc-900/50 border border-white/5 backdrop-blur-xl shadow-2xl p-8 relative overflow-hidden flex-1">
+              <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-gold-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+              <div class="relative z-10 flex flex-col gap-8 h-full">
+                <div>
+                  <p class="text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-3">Contacto directo</p>
+                  <h3 class="text-xl font-bold text-white">¿Prefieres llamarnos?</h3>
+                </div>
+
+                <div class="flex flex-col gap-7">
+                  <a href="tel:+34618645043" class="group flex items-center gap-4">
+                    <div class="w-11 h-11 shrink-0 rounded-full bg-zinc-950 border border-white/10 flex items-center justify-center text-zinc-500 group-hover:text-gold-500 group-hover:border-gold-500/40 transition-all">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </div>
+                    <div>
+                      <p class="text-[10px] text-zinc-600 uppercase tracking-widest font-bold mb-0.5">Teléfono</p>
+                      <p class="text-white font-semibold text-sm group-hover:text-gold-400 transition-colors">+34 618 64 50 43</p>
+                    </div>
+                  </a>
+
+                  <a href="mailto:info@vibeevents.com" class="group flex items-center gap-4">
+                    <div class="w-11 h-11 shrink-0 rounded-full bg-zinc-950 border border-white/10 flex items-center justify-center text-zinc-500 group-hover:text-gold-500 group-hover:border-gold-500/40 transition-all">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                    </div>
+                    <div>
+                      <p class="text-[10px] text-zinc-600 uppercase tracking-widest font-bold mb-0.5">Email</p>
+                      <p class="text-white font-semibold text-sm group-hover:text-gold-400 transition-colors">info@vibeevents.com</p>
+                    </div>
+                  </a>
+
+                  <div class="flex items-center gap-4">
+                    <div class="w-11 h-11 shrink-0 rounded-full bg-zinc-950 border border-white/10 flex items-center justify-center text-zinc-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </div>
+                    <div>
+                      <p class="text-[10px] text-zinc-600 uppercase tracking-widest font-bold mb-0.5">Zona</p>
+                      <p class="text-white font-semibold text-sm">Almería y provincia</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-auto pt-6 border-t border-white/5">
+                  <p class="text-[10px] text-zinc-600 uppercase tracking-widest font-bold mb-2">Horario</p>
+                  <p class="text-zinc-400 text-sm">Lun – Vie &nbsp;<span class="text-white font-medium">09:00 – 21:00</span></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tarjeta: Redes Sociales -->
+            <div class="rounded-[2.5rem] bg-zinc-900/50 border border-white/5 backdrop-blur-xl shadow-2xl p-8">
+              <p class="text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-5">Síguenos</p>
+              <div class="flex items-center gap-3">
+                <a href="https://www.instagram.com/javiberenguel_/" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-zinc-950 border border-white/10 flex items-center justify-center text-zinc-400 hover:bg-gradient-to-tr hover:from-yellow-500 hover:via-pink-500 hover:to-purple-500 hover:text-white hover:border-transparent transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+                </a>
+                <a href="https://www.youtube.com/@JaviBerenguelMUSIC/" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-zinc-950 border border-white/10 flex items-center justify-center text-zinc-400 hover:bg-red-600 hover:text-white hover:border-transparent transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                </a>
+                <a href="https://www.tiktok.com/@javiberenguel_?lang=es-419" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-zinc-950 border border-white/10 flex items-center justify-center text-zinc-400 hover:bg-white hover:text-black hover:border-transparent transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .contact-layout {
+      grid-template-columns: 3fr 2fr;
+      align-items: start;
+    }
+  }
+
+  .contact-form-col,
+  .contact-info-col {
+    min-width: 0;
+  }
+</style>
