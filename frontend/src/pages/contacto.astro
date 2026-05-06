@@ -48,7 +48,8 @@ import Footer from "../components/Footer.astro";
               <p class="text-zinc-500 text-sm mb-10">Todos los campos son obligatorios salvo el teléfono.</p>
 
               <form
-                action="https://formspree.io/f/MAY_NEED_YOUR_ID"
+                id="contact-form"
+                action="https://formspree.io/f/xaqvbjlj"
                 method="POST"
                 class="flex flex-col gap-8"
               >
@@ -104,9 +105,11 @@ import Footer from "../components/Footer.astro";
                 </div>
 
                 <!-- Botón -->
-                <div class="flex justify-end pt-2">
+                <div class="flex items-center justify-between gap-4 pt-2">
+                  <p id="form-feedback" class="text-sm font-medium transition-colors"></p>
                   <button
                     type="submit"
+                    id="submit-btn"
                     class="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.2)] hover:shadow-[0_0_50px_rgba(212,175,55,0.5)] active:scale-95"
                   >
                     Enviar mensaje
@@ -210,5 +213,58 @@ import Footer from "../components/Footer.astro";
   .contact-form-col,
   .contact-info-col {
     min-width: 0;
-  }
 </style>
+
+<script>
+  const contactForm = document.getElementById("contact-form") as HTMLFormElement;
+  const formFeedback = document.getElementById("form-feedback");
+  const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
+
+  if (contactForm && formFeedback && submitBtn) {
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(contactForm);
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = "Enviando...";
+
+      try {
+        const response = await fetch(contactForm.action, {
+          method: contactForm.method,
+          body: formData,
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        if (response.ok) {
+          formFeedback.textContent = "¡Mensaje enviado con éxito!";
+          formFeedback.classList.remove("text-red-500", "text-zinc-500");
+          formFeedback.classList.add("text-green-500");
+          contactForm.reset();
+        } else {
+          formFeedback.textContent = "Hubo un error al enviar el mensaje.";
+          formFeedback.classList.remove("text-green-500", "text-zinc-500");
+          formFeedback.classList.add("text-red-500");
+        }
+      } catch (error) {
+        formFeedback.textContent = "Error de conexión. Inténtalo más tarde.";
+        formFeedback.classList.remove("text-green-500", "text-zinc-500");
+        formFeedback.classList.add("text-red-500");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        
+        // Limpiar mensaje de éxito después de 5 segundos
+        setTimeout(() => {
+          if (formFeedback.classList.contains("text-green-500")) {
+            formFeedback.textContent = "";
+            formFeedback.classList.remove("text-green-500");
+            formFeedback.classList.add("text-zinc-500");
+          }
+        }, 5000);
+      }
+    });
+  }
+</script>
