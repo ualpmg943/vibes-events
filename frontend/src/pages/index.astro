@@ -4,79 +4,93 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="Inicio">
+<Layout title="Inicio" description="VIBE EVENTS — Empresa de sonido, iluminación y DJ para todo tipo de eventos en Almería.">
   <Header />
 
   <main class="flex-grow">
     <!-- Hero Section -->
-    <section class="relative min-h-[100vh] flex items-center justify-center overflow-hidden pt-20">
-      <!-- Elementos decorativos (Glassmorphism + Glow) -->
-      <div class="absolute inset-0 z-0 pointer-events-none">
-        <div class="absolute top-1/3 left-1/4 w-96 h-96 bg-gold-500/20 rounded-full blur-[120px] opacity-70"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-zinc-800/40 rounded-full blur-[100px] opacity-70"></div>
+    <section class="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+      
+      <!-- Imagen de fondo -->
+      <div class="absolute inset-0 z-0">
+        <img 
+          src="/hero-bg.png" 
+          alt="Equipo profesional de DJ y cabezas de iluminación de VIBE EVENTS"
+          class="w-full h-full object-cover object-center opacity-45"
+        />
+        <!-- Gradiente para legibilidad del texto -->
+        <div class="absolute inset-0 bg-gradient-to-b from-zinc-950/70 via-zinc-950/60 to-zinc-950"></div>
       </div>
 
-      <div class="relative z-10 text-center max-w-4xl mx-auto px-6 flex flex-col items-center">
+      <!-- Halos de color dorado (glow) -->
+      <div class="absolute inset-0 z-0 pointer-events-none">
+        <div class="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-gold-500/15 rounded-full blur-[150px] animate-pulse"></div>
+        <div class="absolute bottom-1/3 right-1/3 w-[300px] h-[300px] bg-amber-700/10 rounded-full blur-[100px]"></div>
+      </div>
+
+      <div class="relative z-10 text-center max-w-4xl mx-auto px-6 flex flex-col items-center pt-20">
         <!-- Badge -->
-        <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium mb-8 backdrop-blur-md">
+        <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium mb-10 backdrop-blur-md">
           <span class="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></span>
-          Abierta la contratación 2026
+          Contratación abierta para 2026
         </div>
         
-        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 text-white">
-          Haz que tu fiesta sea <br/> 
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 text-white">
+          Sonido e iluminación<br/> 
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600">
-            Inolvidable
+            para tu evento
           </span>
         </h1>
         
-        <p class="text-lg md:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Diseño sonoro y visual a medida. Especialista en crear atmósferas únicas para bodas, festivales y eventos corporativos de alto nivel.
+        <p class="text-lg md:text-xl text-zinc-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+          Equipamos, instalamos y operamos el sonido, la iluminación y el DJ para bodas, celebraciones y eventos corporativos en Almería y provincia.
         </p>
         
-        <div class="flex flex-col sm:flex-row gap-5 justify-center w-full sm:w-auto">
-          <a href="/reservas" class="px-8 py-4 rounded-full bg-gold-500 text-black font-semibold hover:bg-gold-400 transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transform hover:-translate-y-1">
-            Comprobar Disponibilidad
+        <div class="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
+          <a href="/reservas" class="px-8 py-4 rounded-full bg-gold-500 text-black font-bold text-base hover:bg-gold-400 transition-all shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:shadow-[0_0_40px_rgba(212,175,55,0.5)] transform hover:-translate-y-0.5">
+            Consultar disponibilidad
           </a>
-          <a href="#about" class="px-8 py-4 rounded-full bg-white/5 border border-white/10 text-white font-semibold hover:bg-white/10 backdrop-blur-md transition-all transform hover:-translate-y-1">
-            Descubrir Más
+          <a href="/contacto" class="px-8 py-4 rounded-full bg-zinc-900/60 border border-white/10 text-white font-bold text-base hover:bg-white/10 backdrop-blur-md transition-all transform hover:-translate-y-0.5">
+            Hablar con nosotros
           </a>
         </div>
       </div>
     </section>
 
-    <!-- Espacio para siguientes secciones (Sobre Mí, Servicios) -->
-    <section id="about" class="py-24 bg-zinc-950 border-t border-white/5 relative z-10">
+    <!-- Sección Servicios -->
+    <section class="py-24 bg-zinc-950 relative z-10">
+      <!-- Separador dorado superior -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent"></div>
+
       <div class="max-w-7xl mx-auto px-6">
         <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold mb-4">La Experiencia <span class="text-gold-500">Premium</span></h2>
-          <p class="text-zinc-400 max-w-2xl mx-auto">Más de 10 años haciendo vibrar pistas de baile con un estilo inconfundible.</p>
+          <h2 class="text-3xl md:text-5xl font-bold mb-5 tracking-tight">Qué incluye <span class="text-gold-500">nuestro servicio</span></h2>
+          <p class="text-zinc-400 max-w-xl mx-auto text-base">Todo lo que necesitas para que el sonido y la imagen de tu evento estén al nivel.</p>
         </div>
         
-        <!-- Grid de placeholders para contenido futuro -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
-            <div class="w-12 h-12 rounded-xl bg-gold-500/20 text-gold-500 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="group p-8 rounded-[2rem] bg-zinc-900/40 border border-white/5 backdrop-blur-xl hover:bg-zinc-800/50 hover:border-gold-500/30 transition-all duration-500">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-500/20 to-gold-600/5 text-gold-500 flex items-center justify-center mb-6 border border-gold-500/20 group-hover:scale-110 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
             </div>
-            <h3 class="text-xl font-semibold text-white mb-3">Sonido Impecable</h3>
-            <p class="text-zinc-400 text-sm">Equipos de última generación para garantizar la máxima fidelidad acústica en cualquier espacio.</p>
+            <h3 class="text-xl font-semibold text-white mb-3">Sonido profesional</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">Sistemas de altavoces y subgraves de alto rendimiento adaptados al tamaño y tipo de espacio.</p>
           </div>
           
-          <div class="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
-            <div class="w-12 h-12 rounded-xl bg-gold-500/20 text-gold-500 flex items-center justify-center mb-6">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <div class="group p-8 rounded-[2rem] bg-zinc-900/40 border border-white/5 backdrop-blur-xl hover:bg-zinc-800/50 hover:border-gold-500/30 transition-all duration-500">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-500/20 to-gold-600/5 text-gold-500 flex items-center justify-center mb-6 border border-gold-500/20 group-hover:scale-110 transition-transform">
+               <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             </div>
-            <h3 class="text-xl font-semibold text-white mb-3">Iluminación Dinámica</h3>
-            <p class="text-zinc-400 text-sm">Diseño de luces y efectos visuales sincronizados para crear la atmósfera perfecta.</p>
+            <h3 class="text-xl font-semibold text-white mb-3">Iluminación DMX</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">Cabezas móviles, barras LED y efectos de luz programados y sincronizados en tiempo real.</p>
           </div>
           
-          <div class="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
-            <div class="w-12 h-12 rounded-xl bg-gold-500/20 text-gold-500 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 Z"></path></svg>
+          <div class="group p-8 rounded-[2rem] bg-zinc-900/40 border border-white/5 backdrop-blur-xl hover:bg-zinc-800/50 hover:border-gold-500/30 transition-all duration-500">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-500/20 to-gold-600/5 text-gold-500 flex items-center justify-center mb-6 border border-gold-500/20 group-hover:scale-110 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 Z"></path></svg>
             </div>
-            <h3 class="text-xl font-semibold text-white mb-3">Setup Personalizado</h3>
-            <p class="text-zinc-400 text-sm">Cachimbas, máquinas de fuego, humo bajo y horas extras adaptadas a tu evento.</p>
+            <h3 class="text-xl font-semibold text-white mb-3">Extras y efectos</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">Fuego frío, humo bajo, cachimbas y horas adicionales. Configúralo a tu medida al hacer la reserva.</p>
           </div>
         </div>
       </div>
