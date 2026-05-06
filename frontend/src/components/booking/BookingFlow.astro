@@ -1,412 +1,417 @@
 ---
-// Componente de pasarela de pago / flujo de reserva
+import BookingCalendar from "./BookingCalendar.astro";
+import ExtrasSelector from "./ExtrasSelector.astro";
 ---
 
-<div id="booking-flow-view" class="hidden max-w-5xl mx-auto transition-all duration-500">
-  
-  <div class="mb-8 flex items-center justify-between">
-    <button id="back-to-packs-btn" class="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      Volver a los packs
+<div id="booking-flow-view" class="hidden max-w-6xl mx-auto">
+
+  <!-- Barra de progreso + volver -->
+  <div class="flex items-center justify-between mb-10 px-1">
+    <button id="back-to-packs-btn" class="group flex items-center gap-2.5 text-zinc-500 hover:text-white transition-colors text-sm font-medium">
+      <div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      </div>
+      <span class="hidden sm:block">Cambiar pack</span>
     </button>
-    <div class="flex items-center gap-2 text-sm font-medium">
-      <span class="text-gold-500">Paso <span id="current-step-display">1</span> de 3</span>
+
+    <!-- Stepper visual -->
+    <div class="flex items-center gap-2">
+      {[
+        { num: 1, label: "Fecha" },
+        { num: 2, label: "Extras" },
+        { num: 3, label: "Confirmar" }
+      ].map((s, i) => (
+        <>
+          <div class="flex items-center gap-2">
+            <div
+              id={`step-dot-${s.num}`}
+              class={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all duration-500 ${i === 0 ? 'bg-gold-500 border-gold-500 text-black' : 'bg-transparent border-white/15 text-zinc-600'}`}
+            >
+              {s.num}
+            </div>
+            <span id={`step-label-${s.num}`} class={`hidden md:block text-xs font-semibold uppercase tracking-widest transition-colors duration-500 ${i === 0 ? 'text-gold-500' : 'text-zinc-700'}`}>{s.label}</span>
+          </div>
+          {i < 2 && <div id={`step-line-${s.num}`} class="w-8 sm:w-16 h-px bg-white/10 transition-all duration-500"></div>}
+        </>
+      ))}
+    </div>
+
+    <!-- Pack seleccionado badge -->
+    <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-white/8">
+      <div class="w-2 h-2 rounded-full bg-gold-500"></div>
+      <span id="selected-pack-badge" class="text-white text-xs font-semibold">Pack</span>
     </div>
   </div>
 
-  <div class="rounded-[2.5rem] bg-zinc-900/50 border border-white/5 backdrop-blur-xl shadow-2xl p-8 md:p-12 relative overflow-hidden">
-    <!-- Glow interior -->
-    <div class="absolute -top-24 -right-24 w-72 h-72 bg-gold-500/5 rounded-full blur-[90px] pointer-events-none"></div>
+  <!-- Contenido del flujo -->
+  <form id="booking-form" action="https://formspree.io/f/xaqvbjlj" method="POST" class="relative">
+    <!-- Inputs ocultos -->
+    <input type="hidden" name="pack_seleccionado" id="input-pack" value="" />
+    <input type="hidden" name="fecha_seleccionada" id="input-date" value="" />
+    <input type="hidden" name="extras_seleccionados" id="input-extras" value="" />
 
-    <form id="booking-form" action="https://formspree.io/f/xaqvbjlj" method="POST">
-      <!-- Datos ocultos que se llenan con JS -->
-      <input type="hidden" name="pack_seleccionado" id="input-pack" value="" />
-      <input type="hidden" name="fecha_seleccionada" id="input-date" value="" />
-      <input type="hidden" name="extras_seleccionados" id="input-extras" value="" />
-
-      <!-- PASO 1: CALENDARIO -->
-      <div id="step-1" class="step-container">
-        <h2 class="text-2xl font-bold text-white mb-2">Selecciona la fecha</h2>
-        <p class="text-zinc-500 text-sm mb-8">Elige el día de tu evento. Los días en gris no están disponibles.</p>
+    <!-- ═══════════════════ PASO 1: CALENDARIO ═══════════════════ -->
+    <div id="step-1" class="step-pane">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
         
-        <div class="max-w-md mx-auto bg-zinc-950/50 border border-white/5 rounded-3xl p-6 shadow-inner">
-          <div class="flex justify-between items-center mb-6">
-            <button type="button" class="p-2 text-zinc-400 hover:text-white"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
-            <h3 class="font-bold text-white tracking-wide" id="calendar-month">Octubre 2026</h3>
-            <button type="button" class="p-2 text-zinc-400 hover:text-white"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
-          </div>
-          
-          <div class="grid grid-cols-7 gap-2 mb-2 text-center text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
-            <div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sá</div><div>Do</div>
-          </div>
-          
-          <!-- Días del calendario generados por JS estáticamente para la demo -->
-          <div class="grid grid-cols-7 gap-2 text-center text-sm" id="calendar-days">
-            <!-- Rellenado por JS -->
+        <!-- Calendario principal -->
+        <div class="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+          <div class="absolute -top-16 -right-16 w-48 h-48 bg-gold-500/5 rounded-full blur-[60px] pointer-events-none"></div>
+          <div class="relative z-10">
+            <p class="text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.25em] mb-2">Paso 1 de 3</p>
+            <h2 class="text-2xl font-bold text-white mb-1">¿Cuándo es tu evento?</h2>
+            <p class="text-zinc-500 text-sm mb-8">Los días en gris ya están reservados.</p>
+            <BookingCalendar />
           </div>
         </div>
 
-        <div class="mt-10 flex justify-end">
-          <button type="button" id="btn-next-1" disabled class="px-8 py-3 rounded-full bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+        <!-- Panel lateral de ayuda -->
+        <div class="flex flex-col gap-4">
+          <!-- Fecha seleccionada -->
+          <div class="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-2xl p-6">
+            <p class="text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-3">Fecha elegida</p>
+            <p id="selected-date-display" class="text-zinc-500 text-sm italic">Ninguna seleccionada</p>
+          </div>
+
+          <!-- Info box -->
+          <div class="bg-zinc-900/30 border border-white/5 rounded-2xl p-6 space-y-4">
+            <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em]">Información</p>
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gold-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <p class="text-zinc-400 text-xs leading-relaxed">Reserva sin compromiso. Un confirmación por email te llegará en 24h.</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gold-500"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <p class="text-zinc-400 text-xs leading-relaxed">¿Tienes dudas? Llama a Yordan: <a href="tel:+34618645043" class="text-gold-400 font-medium">+34 618 64 50 43</a></p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="btn-next-1"
+            disabled
+            class="w-full py-4 rounded-2xl bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(212,175,55,0.25)] disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none"
+          >
             Continuar
+            <svg class="inline ml-2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
           </button>
         </div>
       </div>
+    </div>
 
-      <!-- PASO 2: EXTRAS -->
-      <div id="step-2" class="step-container hidden">
-        <h2 class="text-2xl font-bold text-white mb-2">Añade extras</h2>
-        <p class="text-zinc-500 text-sm mb-8">Mejora tu pack con estos servicios adicionales.</p>
+    <!-- ═══════════════════ PASO 2: EXTRAS ═══════════════════ -->
+    <div id="step-2" class="step-pane hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8 items-start">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Extra 1 -->
-          <label class="cursor-pointer group">
-            <input type="checkbox" class="peer sr-only" value="Horas Extra" data-price="100€/h" />
-            <div class="p-6 rounded-2xl border border-white/5 bg-zinc-950/50 peer-checked:border-gold-500/50 peer-checked:bg-gold-500/10 transition-all hover:bg-zinc-900 flex items-start gap-4">
-              <div class="w-6 h-6 rounded border border-zinc-600 peer-checked:border-gold-500 peer-checked:bg-gold-500 flex items-center justify-center text-black shrink-0 mt-0.5 transition-colors">
-                <svg class="opacity-0 peer-checked:opacity-100 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-              <div>
-                <h4 class="text-white font-bold mb-1">Horas Extra de DJ</h4>
-                <p class="text-zinc-500 text-xs leading-relaxed mb-2">Alarga la fiesta el tiempo que necesites.</p>
-                <span class="text-gold-400 text-xs font-semibold">+100€ / hora</span>
-              </div>
-            </div>
-          </label>
-
-          <!-- Extra 2 -->
-          <label class="cursor-pointer group">
-            <input type="checkbox" class="peer sr-only" value="Iluminación Premium" data-price="150€" />
-            <div class="p-6 rounded-2xl border border-white/5 bg-zinc-950/50 peer-checked:border-gold-500/50 peer-checked:bg-gold-500/10 transition-all hover:bg-zinc-900 flex items-start gap-4">
-              <div class="w-6 h-6 rounded border border-zinc-600 peer-checked:border-gold-500 peer-checked:bg-gold-500 flex items-center justify-center text-black shrink-0 mt-0.5 transition-colors">
-                <svg class="opacity-0 peer-checked:opacity-100 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-              <div>
-                <h4 class="text-white font-bold mb-1">Iluminación Premium</h4>
-                <p class="text-zinc-500 text-xs leading-relaxed mb-2">Cabezas móviles y láseres para un efecto WOW.</p>
-                <span class="text-gold-400 text-xs font-semibold">+150€</span>
-              </div>
-            </div>
-          </label>
-          
-          <!-- Extra 3 -->
-          <label class="cursor-pointer group">
-            <input type="checkbox" class="peer sr-only" value="Fuego Frío" data-price="90€" />
-            <div class="p-6 rounded-2xl border border-white/5 bg-zinc-950/50 peer-checked:border-gold-500/50 peer-checked:bg-gold-500/10 transition-all hover:bg-zinc-900 flex items-start gap-4">
-              <div class="w-6 h-6 rounded border border-zinc-600 peer-checked:border-gold-500 peer-checked:bg-gold-500 flex items-center justify-center text-black shrink-0 mt-0.5 transition-colors">
-                <svg class="opacity-0 peer-checked:opacity-100 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-              <div>
-                <h4 class="text-white font-bold mb-1">Máquinas de Fuego Frío</h4>
-                <p class="text-zinc-500 text-xs leading-relaxed mb-2">Ideal para el baile nupcial o momentos clave.</p>
-                <span class="text-gold-400 text-xs font-semibold">+90€</span>
-              </div>
-            </div>
-          </label>
+        <div class="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+          <div class="absolute -bottom-16 -left-16 w-48 h-48 bg-gold-500/5 rounded-full blur-[60px] pointer-events-none"></div>
+          <div class="relative z-10">
+            <p class="text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.25em] mb-2">Paso 2 de 3</p>
+            <h2 class="text-2xl font-bold text-white mb-1">Personaliza tu evento</h2>
+            <p class="text-zinc-500 text-sm mb-8">Añade servicios extra para que tu noche sea inolvidable.</p>
+            <ExtrasSelector />
+          </div>
         </div>
 
-        <div class="mt-10 flex justify-between">
-          <button type="button" id="btn-prev-2" class="px-8 py-3 rounded-full border border-white/10 text-white font-bold text-sm uppercase tracking-widest hover:bg-white/5 transition-colors">
-            Atrás
-          </button>
-          <button type="button" id="btn-next-2" class="px-8 py-3 rounded-full bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 transition-all shadow-lg">
-            Siguiente
-          </button>
+        <!-- Panel lateral extras -->
+        <div class="flex flex-col gap-4">
+          <div class="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-2xl p-6">
+            <p class="text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-4">Seleccionados</p>
+            <ul id="extras-live-list" class="space-y-2">
+              <li class="text-zinc-600 text-xs italic">Ninguno aún</li>
+            </ul>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <button type="button" id="btn-prev-2" class="w-full py-3 rounded-2xl border border-white/10 text-white text-sm font-medium hover:bg-white/5 transition-all">
+              ← Atrás
+            </button>
+            <button type="button" id="btn-next-2" class="w-full py-4 rounded-2xl bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(212,175,55,0.25)]">
+              Continuar →
+            </button>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- PASO 3: RESUMEN Y DATOS -->
-      <div id="step-3" class="step-container hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
-          <div>
-            <h2 class="text-2xl font-bold text-white mb-2">Tus datos</h2>
-            <p class="text-zinc-500 text-sm mb-8">Completa el formulario para enviar tu solicitud de reserva.</p>
-            
-            <div class="flex flex-col gap-5">
-              <div>
-                <label class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Nombre completo</label>
-                <input type="text" name="name" required class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/30 transition-all" placeholder="Ej. Pablo García" />
+    <!-- ═══════════════════ PASO 3: CONFIRMAR ═══════════════════ -->
+    <div id="step-3" class="step-pane hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+        
+        <!-- Formulario -->
+        <div class="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+          <div class="absolute -top-16 -left-16 w-48 h-48 bg-gold-500/5 rounded-full blur-[60px] pointer-events-none"></div>
+          <div class="relative z-10">
+            <p class="text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.25em] mb-2">Paso 3 de 3</p>
+            <h2 class="text-2xl font-bold text-white mb-1">Tus datos de contacto</h2>
+            <p class="text-zinc-500 text-sm mb-8">Necesitamos estos datos para confirmar tu reserva.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-2">Nombre completo *</label>
+                <input type="text" name="name" required placeholder="Ej. Pablo García" class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/20 transition-all" />
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Email</label>
-                <input type="email" name="email" required class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/30 transition-all" placeholder="correo@ejemplo.com" />
+                <label class="block text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-2">Email *</label>
+                <input type="email" name="email" required placeholder="correo@ejemplo.com" class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/20 transition-all" />
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Teléfono</label>
-                <input type="tel" name="phone" required class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/30 transition-all" placeholder="+34 600 000 000" />
+                <label class="block text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-2">Teléfono *</label>
+                <input type="tel" name="phone" required placeholder="+34 600 000 000" class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/20 transition-all" />
               </div>
-              <div>
-                <label class="block text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-2">Lugar del evento (Localidad/Finca)</label>
-                <input type="text" name="location" class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/30 transition-all" placeholder="Ej. Finca el Recreo, Almería" />
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-2">Lugar del evento</label>
+                <input type="text" name="location" placeholder="Ej. Finca El Recreo, Almería" class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/20 transition-all" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-2">Notas adicionales</label>
+                <textarea name="notes" rows="3" placeholder="Cuéntanos algo más sobre tu evento..." class="w-full bg-zinc-950/70 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-700 focus:outline-none focus:border-gold-500/60 focus:ring-1 focus:ring-gold-500/20 transition-all resize-none"></textarea>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="bg-zinc-950/50 border border-white/5 rounded-3xl p-8 flex flex-col">
-            <h3 class="text-[10px] font-bold text-gold-500/70 uppercase tracking-[0.2em] mb-6">Resumen de la reserva</h3>
-            
-            <div class="flex-grow space-y-6">
-              <div class="flex justify-between items-start border-b border-white/5 pb-4">
+        <!-- Resumen lateral -->
+        <div class="flex flex-col gap-4 sticky top-24">
+          <div class="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2rem] p-7 shadow-2xl">
+            <p class="text-[10px] font-bold text-gold-500/60 uppercase tracking-[0.2em] mb-6">Resumen de tu reserva</p>
+
+            <div class="space-y-5">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gold-500"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </div>
                 <div>
-                  <p class="text-xs text-zinc-500 mb-1">Pack</p>
-                  <p id="summary-pack-name" class="text-white font-bold text-lg">-</p>
+                  <p class="text-[10px] text-zinc-600 uppercase tracking-wider mb-1">Pack</p>
+                  <p id="summary-pack" class="text-white font-bold text-sm">—</p>
                 </div>
               </div>
-              
-              <div class="flex justify-between items-start border-b border-white/5 pb-4">
+
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gold-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
                 <div>
-                  <p class="text-xs text-zinc-500 mb-1">Fecha</p>
-                  <p id="summary-date" class="text-white font-bold text-lg">-</p>
+                  <p class="text-[10px] text-zinc-600 uppercase tracking-wider mb-1">Fecha</p>
+                  <p id="summary-date" class="text-white font-bold text-sm">—</p>
                 </div>
               </div>
 
-              <div>
-                <p class="text-xs text-zinc-500 mb-2">Extras seleccionados</p>
-                <ul id="summary-extras-list" class="space-y-2">
-                  <li class="text-sm text-zinc-400">Ninguno</li>
+              <div class="pt-4 border-t border-white/5">
+                <p class="text-[10px] text-zinc-600 uppercase tracking-wider mb-3">Extras</p>
+                <ul id="summary-extras" class="space-y-2">
+                  <li class="text-zinc-500 text-xs italic">Sin extras</li>
                 </ul>
               </div>
             </div>
-
-            <div class="mt-8 pt-6 border-t border-white/10">
-              <p id="form-feedback" class="text-sm mb-4 font-medium transition-colors"></p>
-              <div class="flex justify-between items-center gap-4">
-                <button type="button" id="btn-prev-3" class="px-6 py-3 rounded-full border border-white/10 text-white font-bold text-sm uppercase tracking-widest hover:bg-white/5 transition-colors">
-                  Atrás
-                </button>
-                <button type="submit" id="submit-booking-btn" class="flex-grow py-3 rounded-full bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)]">
-                  Solicitar Reserva
-                </button>
-              </div>
-            </div>
           </div>
 
+          <p id="form-feedback" class="text-sm font-medium text-center min-h-[20px]"></p>
+
+          <div class="flex flex-col gap-3">
+            <button type="button" id="btn-prev-3" class="w-full py-3 rounded-2xl border border-white/10 text-white text-sm font-medium hover:bg-white/5 transition-all">
+              ← Atrás
+            </button>
+            <button
+              type="submit"
+              id="submit-booking-btn"
+              class="w-full py-4 rounded-2xl bg-gold-500 text-black font-bold text-sm uppercase tracking-widest hover:bg-gold-400 active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:shadow-[0_0_50px_rgba(212,175,55,0.5)]"
+            >
+              Solicitar Reserva
+              <svg class="inline ml-2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
         </div>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>
 
+<style>
+  .step-pane {
+    animation: fadeIn 0.3s ease forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
 <script>
-  // Script para manejar el flujo de la pasarela y el calendario
-  document.addEventListener('DOMContentLoaded', () => {
-    // Referencias DOM
-    const packView = document.getElementById('pack-selection-view');
-    const flowView = document.getElementById('booking-flow-view');
-    const selectPackBtns = document.querySelectorAll('.select-pack-btn');
-    const backToPacksBtn = document.getElementById('back-to-packs-btn');
-    
-    const steps = [
-      document.getElementById('step-1'),
-      document.getElementById('step-2'),
-      document.getElementById('step-3')
-    ];
-    const stepDisplay = document.getElementById('current-step-display');
-    
-    // Inputs ocultos
-    const inputPack = document.getElementById('input-pack') as HTMLInputElement;
-    const inputDate = document.getElementById('input-date') as HTMLInputElement;
-    const inputExtras = document.getElementById('input-extras') as HTMLInputElement;
-    
-    // Elementos del resumen
-    const summaryPack = document.getElementById('summary-pack-name');
-    const summaryDate = document.getElementById('summary-date');
-    const summaryExtras = document.getElementById('summary-extras-list');
-    
-    // Botones de navegación
-    const btnNext1 = document.getElementById('btn-next-1') as HTMLButtonElement;
-    const btnNext2 = document.getElementById('btn-next-2');
-    const btnPrev2 = document.getElementById('btn-prev-2');
-    const btnPrev3 = document.getElementById('btn-prev-3');
-    
-    // Formulario
-    const form = document.getElementById('booking-form') as HTMLFormElement;
-    const submitBtn = document.getElementById('submit-booking-btn') as HTMLButtonElement;
-    const formFeedback = document.getElementById('form-feedback');
+  document.addEventListener("DOMContentLoaded", () => {
+    // ── DOM refs ──────────────────────────────────────────────
+    const packView   = document.getElementById("pack-selection-view");
+    const flowView   = document.getElementById("booking-flow-view");
+    const backBtn    = document.getElementById("back-to-packs-btn");
+    const selectBtns = document.querySelectorAll(".select-pack-btn");
 
-    let currentStep = 0;
-    
-    // Calendario Logic
-    const calendarDays = document.getElementById('calendar-days');
-    let selectedDate = null;
-    
-    // Generar calendario de prueba (Mes actual ficticio con días deshabilitados)
-    function renderCalendar() {
-      if (!calendarDays) return;
-      calendarDays.innerHTML = '';
-      
-      const totalDays = 31;
-      const firstDayOffset = 3; // Empieza en Jueves por ejemplo
-      
-      // Espacios vacíos iniciales
-      for(let i=0; i<firstDayOffset; i++) {
-        const empty = document.createElement('div');
-        calendarDays.appendChild(empty);
-      }
-      
-      // Días
-      for(let i=1; i<=totalDays; i++) {
-        const dayBtn = document.createElement('button');
-        dayBtn.type = 'button';
-        
-        // Simular días ocupados (fines de semana al azar, ej: 10, 11, 17, 24)
-        const isUnavailable = [10, 11, 17, 24].includes(i);
-        
-        if (isUnavailable) {
-          dayBtn.className = 'aspect-square flex items-center justify-center rounded-full text-zinc-600 line-through cursor-not-allowed text-xs';
-          dayBtn.disabled = true;
+    const step1 = document.getElementById("step-1");
+    const step2 = document.getElementById("step-2");
+    const step3 = document.getElementById("step-3");
+
+    const btnNext1 = document.getElementById("btn-next-1") as HTMLButtonElement;
+    const btnNext2 = document.getElementById("btn-next-2");
+    const btnPrev2 = document.getElementById("btn-prev-2");
+    const btnPrev3 = document.getElementById("btn-prev-3");
+
+    const inputPack   = document.getElementById("input-pack")   as HTMLInputElement;
+    const inputDate   = document.getElementById("input-date")   as HTMLInputElement;
+    const inputExtras = document.getElementById("input-extras") as HTMLInputElement;
+
+    const selectedPackBadge   = document.getElementById("selected-pack-badge");
+    const selectedDateDisplay = document.getElementById("selected-date-display");
+    const extrasLiveList      = document.getElementById("extras-live-list");
+
+    const summaryPack   = document.getElementById("summary-pack");
+    const summaryDate   = document.getElementById("summary-date");
+    const summaryExtras = document.getElementById("summary-extras");
+
+    const form          = document.getElementById("booking-form") as HTMLFormElement;
+    const submitBtn     = document.getElementById("submit-booking-btn") as HTMLButtonElement;
+    const formFeedback  = document.getElementById("form-feedback");
+
+    let currentStep = 1;
+
+    // ── Stepper visual ────────────────────────────────────────
+    function updateStepper(step: number) {
+      [1, 2, 3].forEach(n => {
+        const dot   = document.getElementById(`step-dot-${n}`);
+        const label = document.getElementById(`step-label-${n}`);
+        const line  = document.getElementById(`step-line-${n}`);
+        if (!dot || !label) return;
+
+        if (n < step) {
+          dot.className = "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all duration-500 bg-gold-500/30 border-gold-500/50 text-gold-500";
+          label.className = "hidden md:block text-xs font-semibold uppercase tracking-widest transition-colors duration-500 text-gold-500/50";
+        } else if (n === step) {
+          dot.className = "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all duration-500 bg-gold-500 border-gold-500 text-black";
+          label.className = "hidden md:block text-xs font-semibold uppercase tracking-widest transition-colors duration-500 text-gold-500";
         } else {
-          dayBtn.className = 'day-btn aspect-square flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors text-sm font-medium';
+          dot.className = "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all duration-500 bg-transparent border-white/15 text-zinc-600";
+          label.className = "hidden md:block text-xs font-semibold uppercase tracking-widest transition-colors duration-500 text-zinc-700";
         }
-        
-        dayBtn.textContent = i.toString();
-        
-        if (!isUnavailable) {
-          dayBtn.addEventListener('click', () => {
-            // Deseleccionar anterior
-            document.querySelectorAll('.day-btn').forEach(btn => {
-              btn.classList.remove('bg-gold-500', 'text-black');
-              btn.classList.add('text-white', 'hover:bg-white/10');
-            });
-            // Seleccionar nuevo
-            dayBtn.classList.remove('text-white', 'hover:bg-white/10');
-            dayBtn.classList.add('bg-gold-500', 'text-black');
-            
-            selectedDate = `${i} Octubre 2026`;
-            inputDate.value = selectedDate;
-            if(summaryDate) summaryDate.textContent = selectedDate;
-            
-            if(btnNext1) btnNext1.disabled = false;
-          });
+        if (line) {
+          line.className = n < step
+            ? "w-8 sm:w-16 h-px bg-gold-500/40 transition-all duration-500"
+            : "w-8 sm:w-16 h-px bg-white/10 transition-all duration-500";
         }
-        calendarDays.appendChild(dayBtn);
-      }
+      });
     }
-    
-    renderCalendar();
 
-    // Navegación de vistas (Packs -> Flow)
-    selectPackBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const packName = target.getAttribute('data-pack-name') || '';
-        
-        // Guardar pack
-        if(inputPack) inputPack.value = packName;
-        if(summaryPack) summaryPack.textContent = packName;
-        
-        // Cambiar vista
-        if(packView && flowView) {
-          packView.classList.add('hidden');
-          flowView.classList.remove('hidden');
-        }
-        goToStep(0);
+    function goToStep(n: number) {
+      [step1, step2, step3].forEach((s, i) => {
+        if (i + 1 === n) s?.classList.remove("hidden");
+        else s?.classList.add("hidden");
+      });
+      currentStep = n;
+      updateStepper(n);
+      if (n === 3) syncSummary();
+    }
+
+    // ── Pack selection ────────────────────────────────────────
+    selectBtns.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const el = e.currentTarget as HTMLElement;
+        const name = el.getAttribute("data-pack-name") || "";
+        if (inputPack) inputPack.value = name;
+        if (selectedPackBadge) selectedPackBadge.textContent = name;
+        if (summaryPack) summaryPack.textContent = name;
+        packView?.classList.add("hidden");
+        flowView?.classList.remove("hidden");
+        goToStep(1);
       });
     });
 
-    if(backToPacksBtn) {
-      backToPacksBtn.addEventListener('click', () => {
-        if(packView && flowView) {
-          flowView.classList.add('hidden');
-          packView.classList.remove('hidden');
-        }
-      });
-    }
+    backBtn?.addEventListener("click", () => {
+      flowView?.classList.add("hidden");
+      packView?.classList.remove("hidden");
+    });
 
-    // Funciones de pasos
-    function goToStep(index) {
-      steps.forEach((step, i) => {
-        if(step) {
-          if (i === index) {
-            step.classList.remove('hidden');
-            // Animación suave
-            step.style.opacity = '0';
-            setTimeout(() => step.style.opacity = '1', 50);
-          } else {
-            step.classList.add('hidden');
-          }
-        }
-      });
-      currentStep = index;
-      if(stepDisplay) stepDisplay.textContent = (index + 1).toString();
-      
-      // Actualizar resumen si entramos al paso 3
-      if (index === 2) updateExtrasSummary();
-    }
+    // ── Date selection (via custom event from calendar) ───────
+    document.addEventListener("dateSelected", (e: Event) => {
+      const { date } = (e as CustomEvent).detail;
+      if (inputDate)   inputDate.value = date;
+      if (selectedDateDisplay) {
+        selectedDateDisplay.textContent = date;
+        selectedDateDisplay.className = "text-white font-bold text-sm";
+      }
+      if (summaryDate) summaryDate.textContent = date;
+      if (btnNext1)    btnNext1.disabled = false;
+    });
 
-    if(btnNext1) btnNext1.addEventListener('click', () => goToStep(1));
-    if(btnNext2) btnNext2.addEventListener('click', () => goToStep(2));
-    if(btnPrev2) btnPrev2.addEventListener('click', () => goToStep(0));
-    if(btnPrev3) btnPrev3.addEventListener('click', () => goToStep(1));
-
-    // Extras lógicas
-    function updateExtrasSummary() {
-      const checkboxes = document.querySelectorAll('#step-2 input[type="checkbox"]:checked') as NodeListOf<HTMLInputElement>;
-      const extras = Array.from(checkboxes).map(cb => `${cb.value} (${cb.getAttribute('data-price')})`);
-      
-      if(inputExtras) inputExtras.value = extras.join(', ');
-      
-      if(summaryExtras) {
-        if (extras.length === 0) {
-          summaryExtras.innerHTML = '<li class="text-sm text-zinc-400">Ninguno</li>';
-        } else {
-          summaryExtras.innerHTML = extras.map(ex => `<li class="text-sm text-white flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-gold-500"></div>${ex}</li>`).join('');
-        }
+    // ── Extras live list ──────────────────────────────────────
+    function updateExtrasLive() {
+      const checked = document.querySelectorAll(".extra-checkbox:checked") as NodeListOf<HTMLInputElement>;
+      const items   = Array.from(checked);
+      if (extrasLiveList) {
+        extrasLiveList.innerHTML = items.length === 0
+          ? '<li class="text-zinc-600 text-xs italic">Ninguno aún</li>'
+          : items.map(cb => `<li class="flex items-center gap-2 text-xs text-zinc-300"><div class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></div>${cb.value} <span class="text-zinc-600 ml-auto">${cb.getAttribute("data-price")}</span></li>`).join("");
       }
     }
 
-    // Form Submission (AJAX Formspree)
-    if (form && submitBtn && formFeedback) {
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(form);
-        submitBtn.disabled = true;
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = "Enviando...";
+    document.addEventListener("change", (e) => {
+      if ((e.target as HTMLElement).classList.contains("extra-checkbox")) updateExtrasLive();
+    });
 
-        try {
-          const response = await fetch(form.action, {
-            method: form.method,
-            body: formData,
-            headers: {
-              Accept: "application/json",
-            },
-          });
-
-          if (response.ok) {
-            formFeedback.textContent = "¡Reserva solicitada con éxito! Te contactaremos pronto.";
-            formFeedback.className = "text-sm mb-4 font-medium text-green-500";
-            form.reset();
-            // Deseleccionar fecha y resetear
-            document.querySelectorAll('.day-btn').forEach(b => {
-              b.classList.remove('bg-gold-500', 'text-black');
-              b.classList.add('text-white');
-            });
-            selectedDate = null;
-            if(btnNext1) btnNext1.disabled = true;
-            
-            setTimeout(() => {
-              if(packView && flowView) {
-                flowView.classList.add('hidden');
-                packView.classList.remove('hidden');
-              }
-              formFeedback.textContent = "";
-            }, 3000);
-
-          } else {
-            formFeedback.textContent = "Hubo un error al enviar la solicitud.";
-            formFeedback.className = "text-sm mb-4 font-medium text-red-500";
-          }
-        } catch (error) {
-          formFeedback.textContent = "Error de conexión. Inténtalo más tarde.";
-          formFeedback.className = "text-sm mb-4 font-medium text-red-500";
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalText;
-        }
-      });
+    // ── Summary sync ──────────────────────────────────────────
+    function syncSummary() {
+      const checked = document.querySelectorAll(".extra-checkbox:checked") as NodeListOf<HTMLInputElement>;
+      const items   = Array.from(checked);
+      const extrasText = items.map(cb => `${cb.value} (${cb.getAttribute("data-price")})`).join(", ");
+      if (inputExtras) inputExtras.value = extrasText || "Ninguno";
+      if (summaryExtras) {
+        summaryExtras.innerHTML = items.length === 0
+          ? '<li class="text-zinc-500 text-xs italic">Sin extras</li>'
+          : items.map(cb => `<li class="flex items-center gap-2 text-xs text-white"><div class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></div>${cb.value}<span class="text-gold-400 font-semibold ml-auto">${cb.getAttribute("data-price")}</span></li>`).join("");
+      }
     }
+
+    // ── Navigation ────────────────────────────────────────────
+    btnNext1?.addEventListener("click", () => goToStep(2));
+    btnNext2?.addEventListener("click", () => goToStep(3));
+    btnPrev2?.addEventListener("click", () => goToStep(1));
+    btnPrev3?.addEventListener("click", () => goToStep(2));
+
+    // ── Form submit (AJAX Formspree) ──────────────────────────
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!submitBtn || !formFeedback) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = "Enviando...";
+
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+
+        if (res.ok) {
+          formFeedback.textContent = "¡Reserva solicitada! Te contactaremos en 24h.";
+          formFeedback.className = "text-sm font-medium text-center text-green-500 min-h-[20px]";
+          form.reset();
+          setTimeout(() => {
+            flowView?.classList.add("hidden");
+            packView?.classList.remove("hidden");
+            formFeedback.textContent = "";
+          }, 3500);
+        } else {
+          formFeedback.textContent = "Hubo un error. Por favor, inténtalo de nuevo.";
+          formFeedback.className = "text-sm font-medium text-center text-red-500 min-h-[20px]";
+        }
+      } catch {
+        formFeedback.textContent = "Error de conexión. Inténtalo más tarde.";
+        formFeedback.className = "text-sm font-medium text-center text-red-500 min-h-[20px]";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Solicitar Reserva <svg class="inline ml-2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+      }
+    });
   });
 </script>

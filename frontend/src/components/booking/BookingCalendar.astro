@@ -1,0 +1,190 @@
+---
+// Componente de Calendario de Reservas
+const unavailableDays = [3, 10, 11, 17, 18, 24, 25];
+const today = new Date();
+const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const currentMonthLabel = `${MONTHS[today.getMonth()]} ${today.getFullYear()}`;
+---
+
+<div id="booking-calendar" class="w-full select-none">
+  <!-- Header del mes -->
+  <div class="flex justify-between items-center mb-6">
+    <button
+      type="button"
+      id="cal-prev-month"
+      class="w-10 h-10 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <p class="text-white font-bold text-base tracking-wide" id="cal-month-label">{currentMonthLabel}</p>
+    <button
+      type="button"
+      id="cal-next-month"
+      class="w-10 h-10 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <!-- Cabecera días de la semana -->
+  <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; margin-bottom:8px;">
+    {["L","M","X","J","V","S","D"].map(d => (
+      <div style="text-align:center; font-size:10px; font-weight:700; color:#52525b; text-transform:uppercase; letter-spacing:0.1em; padding:4px 0;">{d}</div>
+    ))}
+  </div>
+
+  <!-- Grid de días (rellenado por JS) -->
+  <div id="cal-days-grid" style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px;"></div>
+
+  <!-- Leyenda -->
+  <div class="flex items-center justify-end gap-5 mt-5">
+    <div class="flex items-center gap-2">
+      <div style="width:12px;height:12px;border-radius:4px;background:#18181b;border:1px solid rgba(255,255,255,0.1);"></div>
+      <span style="font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:0.08em;">No disponible</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div style="width:12px;height:12px;border-radius:4px;background:#D4AF37;"></div>
+      <span style="font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:0.08em;">Seleccionado</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const UNAVAILABLE: number[] = [3, 10, 11, 17, 18, 24, 25];
+  const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+  let viewDate = new Date();
+  viewDate.setDate(1);
+  let selectedDate: Date | null = null;
+
+  const STYLES = {
+    base: `
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(39,39,42,0.5);
+      color: #fff;
+      transition: all 0.15s ease;
+    `,
+    unavailable: `
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: not-allowed;
+      border: 1px solid rgba(255,255,255,0.04);
+      background: rgba(9,9,11,0.5);
+      color: #3f3f46;
+      text-decoration: line-through;
+    `,
+    selected: `
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid #D4AF37;
+      background: #D4AF37;
+      color: #000;
+      box-shadow: 0 0 20px rgba(212,175,55,0.5);
+      transform: scale(1.05);
+      transition: all 0.15s ease;
+    `,
+    empty: `width:100%; aspect-ratio:1/1;`
+  };
+
+  function renderCalendar() {
+    const grid = document.getElementById("cal-days-grid");
+    const label = document.getElementById("cal-month-label");
+    if (!grid || !label) return;
+
+    const year  = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+
+    label.textContent = `${MONTHS[month]} ${year}`;
+    grid.innerHTML = "";
+
+    const firstDay  = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const offset    = firstDay === 0 ? 6 : firstDay - 1; // Lunes = 0
+
+    // Celdas vacías
+    for (let i = 0; i < offset; i++) {
+      const empty = document.createElement("div");
+      empty.style.cssText = STYLES.empty;
+      grid.appendChild(empty);
+    }
+
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+
+    // Días
+    for (let d = 1; d <= totalDays; d++) {
+      const thisDate = new Date(year, month, d);
+      const isPast   = thisDate < todayMidnight;
+      const isUnavailable = UNAVAILABLE.includes(d) && !isPast;
+      const isSelected = selectedDate?.toDateString() === thisDate.toDateString();
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = String(d);
+
+      if (isPast || isUnavailable) {
+        btn.style.cssText = STYLES.unavailable;
+        btn.disabled = true;
+      } else if (isSelected) {
+        btn.style.cssText = STYLES.selected;
+      } else {
+        btn.style.cssText = STYLES.base;
+        btn.addEventListener("mouseover", () => {
+          if (selectedDate?.toDateString() !== thisDate.toDateString()) {
+            btn.style.background = "rgba(63,63,70,0.9)";
+            btn.style.borderColor = "rgba(255,255,255,0.2)";
+          }
+        });
+        btn.addEventListener("mouseout", () => {
+          if (selectedDate?.toDateString() !== thisDate.toDateString()) {
+            btn.style.background = "rgba(39,39,42,0.5)";
+            btn.style.borderColor = "rgba(255,255,255,0.06)";
+          }
+        });
+        btn.addEventListener("click", () => {
+          selectedDate = thisDate;
+          const formatted = `${d} de ${MONTHS[month]} de ${year}`;
+          document.dispatchEvent(new CustomEvent("dateSelected", { detail: { date: formatted } }));
+          renderCalendar();
+        });
+      }
+
+      grid.appendChild(btn);
+    }
+  }
+
+  document.getElementById("cal-prev-month")?.addEventListener("click", () => {
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    renderCalendar();
+  });
+
+  document.getElementById("cal-next-month")?.addEventListener("click", () => {
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    renderCalendar();
+  });
+
+  // En Astro, los scripts de módulo se ejecutan tras el parse del DOM
+  renderCalendar();
+</script>
