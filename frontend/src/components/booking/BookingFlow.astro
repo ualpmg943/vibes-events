@@ -343,31 +343,102 @@ import ExtrasSelector from "./ExtrasSelector.astro";
       if (btnNext1)    btnNext1.disabled = false;
     });
 
-    // ── Extras live list ──────────────────────────────────────
-    function updateExtrasLive() {
-      const checked = document.querySelectorAll(".extra-checkbox:checked") as NodeListOf<HTMLInputElement>;
-      const items   = Array.from(checked);
+    // ── Extras logic (Quantity based) ────────────────────────
+    function updateExtras() {
+      const cards = document.querySelectorAll(".extra-card");
+      const selectedExtras: { name: string, qty: number, price: string }[] = [];
+
+      cards.forEach(card => {
+        const name = card.getAttribute("data-name") || "";
+        const price = card.getAttribute("data-price") || "";
+        const qtyInput = card.querySelector(".extra-qty-input") as HTMLInputElement;
+        const qty = parseInt(qtyInput.value) || 0;
+
+        const qtyDisplay = card.querySelector(".qty-display");
+        const badge = card.querySelector(".qty-badge");
+        const badgeVal = card.querySelector(".qty-badge-val");
+
+        if (qty > 0) {
+          card.classList.add("active");
+          badge?.classList.remove("hidden");
+          if (badgeVal) badgeVal.textContent = qty.toString();
+          selectedExtras.push({ name, qty, price });
+        } else {
+          card.classList.remove("active");
+          badge?.classList.add("hidden");
+        }
+        if (qtyDisplay) qtyDisplay.textContent = qty.toString();
+      });
+
+      // Update live list
       if (extrasLiveList) {
-        extrasLiveList.innerHTML = items.length === 0
+        extrasLiveList.innerHTML = selectedExtras.length === 0
           ? '<li class="text-zinc-600 text-xs italic">Ninguno aún</li>'
-          : items.map(cb => `<li class="flex items-center gap-2 text-xs text-zinc-300"><div class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></div>${cb.value} <span class="text-zinc-600 ml-auto">${cb.getAttribute("data-price")}</span></li>`).join("");
+          : selectedExtras.map(ex => `
+              <li class="flex items-center gap-2 text-[11px] text-zinc-300">
+                <div class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></div>
+                <span class="flex-1">${ex.name} <b class="text-gold-500">x${ex.qty}</b></span>
+                <span class="text-zinc-600">${ex.price}</span>
+              </li>
+            `).join("");
       }
+      
+      syncSummary(selectedExtras);
     }
 
-    document.addEventListener("change", (e) => {
-      if ((e.target as HTMLElement).classList.contains("extra-checkbox")) updateExtrasLive();
+    // Event delegation for +/- buttons
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const plusBtn = target.closest(".qty-plus");
+      const minusBtn = target.closest(".qty-minus");
+
+      if (plusBtn || minusBtn) {
+        const btn = (plusBtn || minusBtn) as HTMLElement;
+        const id = btn.getAttribute("data-id");
+        const qtyInput = document.getElementById(`input-${id}`) as HTMLInputElement;
+        if (!qtyInput) return;
+        
+        let qty = parseInt(qtyInput.value) || 0;
+
+        if (plusBtn) qty++;
+        if (minusBtn && qty > 0) qty--;
+
+        qtyInput.value = qty.toString();
+        updateExtras();
+      }
     });
 
     // ── Summary sync ──────────────────────────────────────────
-    function syncSummary() {
-      const checked = document.querySelectorAll(".extra-checkbox:checked") as NodeListOf<HTMLInputElement>;
-      const items   = Array.from(checked);
-      const extrasText = items.map(cb => `${cb.value} (${cb.getAttribute("data-price")})`).join(", ");
+    function syncSummary(selectedExtras?: { name: string, qty: number, price: string }[]) {
+      if (!selectedExtras) {
+        // Fallback if called without args (e.g. step transition)
+        const cards = document.querySelectorAll(".extra-card");
+        selectedExtras = [];
+        cards.forEach(card => {
+          const qty = parseInt((card.querySelector(".extra-qty-input") as HTMLInputElement)?.value || "0");
+          if (qty > 0) {
+            selectedExtras?.push({
+              name: card.getAttribute("data-name") || "",
+              qty: qty,
+              price: card.getAttribute("data-price") || ""
+            });
+          }
+        });
+      }
+
+      const extrasText = selectedExtras.map(ex => `${ex.name} x${ex.qty} (${ex.price})`).join(", ");
       if (inputExtras) inputExtras.value = extrasText || "Ninguno";
+      
       if (summaryExtras) {
-        summaryExtras.innerHTML = items.length === 0
+        summaryExtras.innerHTML = selectedExtras.length === 0
           ? '<li class="text-zinc-500 text-xs italic">Sin extras</li>'
-          : items.map(cb => `<li class="flex items-center gap-2 text-xs text-white"><div class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></div>${cb.value}<span class="text-gold-400 font-semibold ml-auto">${cb.getAttribute("data-price")}</span></li>`).join("");
+          : selectedExtras.map(ex => `
+              <li class="flex items-center gap-2 text-xs text-white">
+                <div class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></div>
+                <span class="flex-1">${ex.name} <b class="text-gold-400">x${ex.qty}</b></span>
+                <span class="text-gold-400/60 font-semibold">${ex.price}</span>
+              </li>
+            `).join("");
       }
     }
 
