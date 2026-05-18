@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: vibes-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-vibes_events}
+      POSTGRES_USER: ${DB_USERNAME:-vibes_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-vibes_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-vibes_user} -d ${DB_NAME:-vibes_events}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: vibes-backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-vibes_events}
+      DB_USERNAME: ${DB_USERNAME:-vibes_user}
+      DB_PASSWORD: ${DB_PASSWORD:-vibes_pass}
+      JWT_SECRET: ${JWT_SECRET:-default-jwt-secret-change-in-production}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@vibeevents.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: vibes-frontend
+    restart: unless-stopped
+    environment:
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:8080/api}
+      PUBLIC_FORMSPREE_ID: ${PUBLIC_FORMSPREE_ID:-}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

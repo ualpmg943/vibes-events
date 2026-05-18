@@ -3,6 +3,8 @@
 #  Stack: Astro + Tailwind + React (frontend) | Spring Boot + Maven + PostgreSQL (backend)
 # ============================================================
 
+AGENTS.md
+
 # ─────────────────────────────────────────
 #  SISTEMA OPERATIVO
 # ─────────────────────────────────────────
@@ -29,10 +31,8 @@ $RECYCLE.BIN/
 #  EDITORES / IDEs
 # ─────────────────────────────────────────
 
-# VS Code — mantener .vscode/extensions.json si quieres compartir extensiones recomendadas
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
+# VS Code — ignorar configuraciones locales del editor
+.vscode/
 
 # IntelliJ IDEA / WebStorm
 .idea/
